@@ -1,0 +1,55 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import plot_confusion_matrix
+
+#Data Preparation
+
+data = pd.read_csv('Dia_Car_and_Dia_only_Features.csv')
+x = data[['Age', 'Gender', 'Node_match_score', 'Edge_match_score','Cluster_match_score']]
+y = data['Output']
+
+#Train and Test data split (75% for training and 25% for testing)
+
+x_train, x_test, y_train, y_test=train_test_split(x,y,test_size=0.25)
+
+#Model
+
+model=RandomForestClassifier(max_depth=3)
+classifier=model.fit(x_train,y_train)
+
+#prediction
+
+predictions=model.predict(x_test)
+
+
+#Accuracy
+
+score=accuracy_score(y_test, predictions)
+print(score);
+
+#Confusion matrix
+
+confusion_matrix(y_test, predictions)
+
+class_names=sorted(y.unique())
+
+# Plot confusion matrix
+
+titles_options = [("Confusion matrix, without normalization", None),
+                  ("Normalized confusion matrix", 'true')]
+for title, normalize in titles_options:
+    disp = plot_confusion_matrix(classifier, x_test, y_test,
+                                 display_labels=class_names,
+                                 cmap=plt.cm.Blues,
+                                 normalize=normalize)
+    disp.ax_.set_title(title)
+
+    print(title)
+    print(disp.confusion_matrix)
+
+plt.show()
